@@ -1,7 +1,9 @@
 /* eslint-disable node/no-missing-import */
 /* eslint-disable no-unused-expressions */
 import { expect } from "chai";
-import { developmentChains, networkConfig } from "../helper-hardhat-config";
+import {
+  developmentChains /* networkConfig */,
+} from "../helper-hardhat-config";
 import { ethers, network, deployments } from "hardhat";
 import { BasicNft } from "../typechain";
 
@@ -9,6 +11,7 @@ import { BasicNft } from "../typechain";
   ? describe.skip
   : describe("Basic NFT Unit Tests", function () {
       let basicNft: BasicNft;
+      // eslint-disable-next-line no-unused-vars
       let deployer;
 
       beforeEach(async () => {
