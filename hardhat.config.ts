@@ -14,9 +14,21 @@ dotenv.config({ path: path.join(__dirname, "/.env.local") });
 dotenv.config();
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.6",
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.7",
+      },
+      {
+        version: "0.6.6",
+      },
+    ],
+  },
   namedAccounts: { deployer: { default: 0 } },
   networks: {
+    hardhat: {
+      chainId: 31337,
+    },
     rinkeby: {
       url: process.env.RINKEBY_URL || "",
       accounts:
@@ -26,9 +38,14 @@ const config: HardhatUserConfig = {
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
     currency: "USD",
+    outputFile: "gas-report.txt",
+    noColors: true,
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
+  },
+  mocha: {
+    timeout: 200000, // 200 seconds max for running tests
   },
 };
 
