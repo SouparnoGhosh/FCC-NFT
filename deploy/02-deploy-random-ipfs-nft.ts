@@ -12,9 +12,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { VRFCoordinatorV2Mock } from "../typechain";
 import { BigNumberish } from "@ethersproject/bignumber";
-import {
-  storeImages /* storeTokeUriMetadata */,
-} from "../utils/uploadToPinata";
+import { storeImages, storeTokenUriMetadata } from "../utils/uploadToPinata";
 
 const FUND_AMOUNT = "1000000000000000000000";
 const imagesLocation = "./images/randomNft/";
@@ -92,12 +90,6 @@ const deployRandomIpfsNft: DeployFunction = async function (
   });
   log("----------------------------------");
 
-  // My testing Grounds
-  const tokenUris2 = await handleTokenUris();
-  log(`Testing Grounds`);
-  log(tokenUris2);
-  log("----------------------------------");
-
   // Verify the deployment
   if (
     !developmentChains.includes(network.name) &&
@@ -109,9 +101,25 @@ const deployRandomIpfsNft: DeployFunction = async function (
 };
 
 async function handleTokenUris() {
-  // const tokenUris: any[] = [];
-  const tokenUris = await storeImages(imagesLocation);
+  const tokenUris: any[] = [];
+  const { responses: imageUploadResponses, files } = await storeImages(
+    imagesLocation
+  );
+  for (const imageUploadResponseIndex in imageUploadResponses) {
+    // eslint-disable-next-line node/no-unsupported-features/es-syntax
+    const tokenUriMetadata = { ...metadataTemplate };
+    tokenUriMetadata.name = files[imageUploadResponseIndex].replace(".png", "");
+    tokenUriMetadata.description = `An adorable ${tokenUriMetadata.name} pup!`;
+    tokenUriMetadata.image = `ipfs://${imageUploadResponses[imageUploadResponseIndex].IpfsHash}`;
+    console.log(`Uploading ${tokenUriMetadata.name}...`);
+    const metadataUploadResponse = await storeTokenUriMetadata(
+      tokenUriMetadata
+    );
+    tokenUris.push(`ipfs://${metadataUploadResponse!.IpfsHash}`);
+  }
 
+  console.log("Token URIs uploaded! They are:");
+  console.log(tokenUris);
   return tokenUris;
 }
 
