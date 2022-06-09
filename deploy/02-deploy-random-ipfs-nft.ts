@@ -48,8 +48,7 @@ const deployRandomIpfsNft: DeployFunction = async function (
 
   // If we need to upload the images to Pinata, handleTokenUris will run
   if (process.env.UPLOAD_TO_PINATA === "true") {
-    const tokenUris2 = await handleTokenUris();
-    console.log(tokenUris2);
+    tokenUris = await handleTokenUris();
   }
 
   if (chainId === 31337) {
@@ -68,10 +67,6 @@ const deployRandomIpfsNft: DeployFunction = async function (
     vrfCoordinatorV2Address = networkConfig[chainId].vrfCoordinatorV2!;
     subscriptionId = networkConfig[chainId].subscriptionId!;
   }
-
-  const tokenUris2 = await handleTokenUris();
-  log(tokenUris2);
-  log("sdfsdf");
 
   const waitBlockConfirmations = developmentChains.includes(network.name)
     ? 1
@@ -95,6 +90,12 @@ const deployRandomIpfsNft: DeployFunction = async function (
     log: true,
     waitConfirmations: waitBlockConfirmations || 1,
   });
+  log("----------------------------------");
+
+  // My testing Grounds
+  const tokenUris2 = await handleTokenUris();
+  log(`Testing Grounds`);
+  log(tokenUris2);
   log("----------------------------------");
 
   // Verify the deployment
