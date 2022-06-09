@@ -12,7 +12,9 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { VRFCoordinatorV2Mock } from "../typechain";
 import { BigNumberish } from "@ethersproject/bignumber";
-import { storeImages, storeTokeUriMetadata } from "../utils/uploadToPinata";
+import {
+  storeImages /* storeTokeUriMetadata */,
+} from "../utils/uploadToPinata";
 
 const FUND_AMOUNT = "1000000000000000000000";
 const imagesLocation = "./images/randomNft/";
@@ -46,7 +48,8 @@ const deployRandomIpfsNft: DeployFunction = async function (
 
   // If we need to upload the images to Pinata, handleTokenUris will run
   if (process.env.UPLOAD_TO_PINATA === "true") {
-    tokenUris = await handleTokenUris();
+    const tokenUris2 = await handleTokenUris();
+    console.log(tokenUris2);
   }
 
   if (chainId === 31337) {
@@ -65,6 +68,10 @@ const deployRandomIpfsNft: DeployFunction = async function (
     vrfCoordinatorV2Address = networkConfig[chainId].vrfCoordinatorV2!;
     subscriptionId = networkConfig[chainId].subscriptionId!;
   }
+
+  const tokenUris2 = await handleTokenUris();
+  log(tokenUris2);
+  log("sdfsdf");
 
   const waitBlockConfirmations = developmentChains.includes(network.name)
     ? 1
@@ -101,7 +108,8 @@ const deployRandomIpfsNft: DeployFunction = async function (
 };
 
 async function handleTokenUris() {
-  const tokenUris: any[] = [];
+  // const tokenUris: any[] = [];
+  const tokenUris = await storeImages(imagesLocation);
 
   return tokenUris;
 }
