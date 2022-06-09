@@ -12,15 +12,28 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { VRFCoordinatorV2Mock } from "../typechain";
 import { BigNumberish } from "@ethersproject/bignumber";
-// import { storeImages, storeTokeUriMetadata } from "../utils/uploadToPinata";
+import { storeImages, storeTokeUriMetadata } from "../utils/uploadToPinata";
 
 const FUND_AMOUNT = "1000000000000000000000";
-// const imagesLocation = "./images/randomNft/";
-const tokenUris = [
+const imagesLocation = "./images/randomNft/";
+let tokenUris = [
   "ipfs://QmaVkBn2tKmjbhphU7eyztbvSQU5EXDdqRyXZtRhSGgJGo",
   "ipfs://QmYQC5aGZu2PTH8XzbJrbDnvhj3gVs7ya33H9mqUNvST3d",
   "ipfs://QmZYmH5iDbD6v3U2ixoVAjioSzvWJszDzYdbeCLquGSpVm",
 ];
+
+// Meta Data Template
+const metadataTemplate = {
+  name: "",
+  description: "",
+  image: "",
+  attributes: [
+    {
+      trait_type: "Cuteness",
+      value: 100,
+    },
+  ],
+};
 
 const deployRandomIpfsNft: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
@@ -30,6 +43,11 @@ const deployRandomIpfsNft: DeployFunction = async function (
   const { deployer } = await getNamedAccounts();
   const chainId = network.config.chainId!;
   let vrfCoordinatorV2Address: string, subscriptionId: BigNumberish | string;
+
+  // If we need to upload the images to Pinata, handleTokenUris will run
+  if (process.env.UPLOAD_TO_PINATA === "true") {
+    tokenUris = await handleTokenUris();
+  }
 
   if (chainId === 31337) {
     // create VRFV2 Subscription
@@ -81,6 +99,12 @@ const deployRandomIpfsNft: DeployFunction = async function (
     await verify(randomIpfsNft.address, constructorArgs);
   }
 };
+
+async function handleTokenUris() {
+  const tokenUris: any[] = [];
+
+  return tokenUris;
+}
 
 export default deployRandomIpfsNft;
 deployRandomIpfsNft.tags = ["all", "randomipfs", "main"];
