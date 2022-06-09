@@ -3,9 +3,9 @@
 import { expect } from "chai";
 import {
   developmentChains /* networkConfig */,
-} from "../helper-hardhat-config";
+} from "../../helper-hardhat-config";
 import { ethers, network, deployments } from "hardhat";
-import { BasicNft } from "../typechain";
+import { BasicNft } from "../../typechain";
 
 !developmentChains.includes(network.name)
   ? describe.skip
