@@ -38,4 +38,4 @@ const deployBasicNft: DeployFunction = async function (
 };
 
 export default deployBasicNft;
-deployBasicNft.tags = ["all", "basicNft"];
+deployBasicNft.tags = ["all", "main"];

@@ -3,7 +3,7 @@
 import {
   developmentChains,
   VERIFICATION_BLOCK_CONFIRMATIONS,
-  networkConfig,
+  // networkConfig,
 } from "../helper-hardhat-config";
 import verify from "../utils/verify";
 import { DeployFunction } from "hardhat-deploy/types";
@@ -24,7 +24,8 @@ const deployDynamicSvgNft: DeployFunction = async function (
     const EthUsdAggregator = await deployments.get("MockV3Aggregator");
     ethUsdPriceFeedAddress = EthUsdAggregator.address;
   } else {
-    ethUsdPriceFeedAddress = networkConfig[chainId].ethUsdPriceFeed!;
+    // ethUsdPriceFeedAddress = networkConfig[chainId].ethUsdPriceFeed!;
+    ethUsdPriceFeedAddress = "0x8A753747A1Fa494EC906cE90E9f37563A8AF630e";
   }
 
   const waitBlockConfirmations = developmentChains.includes(network.name)
@@ -60,4 +61,4 @@ const deployDynamicSvgNft: DeployFunction = async function (
 };
 
 export default deployDynamicSvgNft;
-deployDynamicSvgNft.tags = ["all", "dynamicsvg", "main"];
+deployDynamicSvgNft.tags = ["all", "main", "dynamic"];

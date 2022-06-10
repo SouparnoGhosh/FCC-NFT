@@ -22,6 +22,8 @@ let tokenUris = [
   "ipfs://QmZYmH5iDbD6v3U2ixoVAjioSzvWJszDzYdbeCLquGSpVm",
 ];
 
+// Can't use helper hardhat config? Why?
+
 // Meta Data Template
 const metadataTemplate = {
   name: "",
@@ -62,8 +64,10 @@ const deployRandomIpfsNft: DeployFunction = async function (
     // Our mock makes it so we don't actually have to worry about sending fund
     await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, FUND_AMOUNT);
   } else {
-    vrfCoordinatorV2Address = networkConfig[chainId].vrfCoordinatorV2!;
-    subscriptionId = networkConfig[chainId].subscriptionId!;
+    // vrfCoordinatorV2Address = networkConfig[chainId].vrfCoordinatorV2 as string;
+    vrfCoordinatorV2Address = "0x6168499c0cFfCaCD319c818142124B7A15E857ab";
+    // subscriptionId = networkConfig[chainId!].subscriptionId!;
+    subscriptionId = "6147";
   }
 
   const waitBlockConfirmations = developmentChains.includes(network.name)
@@ -75,9 +79,12 @@ const deployRandomIpfsNft: DeployFunction = async function (
   const constructorArgs = [
     vrfCoordinatorV2Address,
     subscriptionId,
-    networkConfig[chainId].gasLane!,
-    networkConfig[chainId].mintFee!,
-    networkConfig[chainId].callbackGasLimit!,
+    // networkConfig[chainId].gasLane!,
+    "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc",
+    // networkConfig[chainId].mintFee!,
+    "10000000000000000",
+    // networkConfig[chainId].callbackGasLimit!,
+    "500000",
     tokenUris,
   ];
 
@@ -124,4 +131,4 @@ async function handleTokenUris() {
 }
 
 export default deployRandomIpfsNft;
-deployRandomIpfsNft.tags = ["all", "randomipfs"];
+deployRandomIpfsNft.tags = ["all", "main", "random"];
