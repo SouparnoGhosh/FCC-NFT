@@ -34,6 +34,7 @@ const deployDynamicSvgNft: DeployFunction = async function (
   const lowSVG = await fs.readFileSync("./images/dynamicNft/frown.svg", {
     encoding: "utf8",
   });
+
   const highSVG = await fs.readFileSync("./images/dynamicNft/happy.svg", {
     encoding: "utf8",
   });
