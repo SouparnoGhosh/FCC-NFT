@@ -3,7 +3,7 @@
 /* eslint-disable node/no-missing-import */
 import { assert, expect } from "chai";
 import { network, deployments, ethers } from "hardhat";
-import { developmentChains, networkConfig } from "../../helper-hardhat-config";
+import { developmentChains } from "../../helper-hardhat-config";
 import { DynamicSvgNft, MockV3Aggregator } from "../../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
@@ -36,6 +36,27 @@ import {
           assert.equal(lowSVG, lowSVGImageuri);
           assert.equal(highSVG, highSVGimageUri);
           assert.equal(priceFeed, mockV3Aggregator.address);
+        });
+      });
+
+      describe("mintNft", () => {
+        it("emits an event and creates the NFT", async function () {
+          const highValue = ethers.utils.parseEther("1"); // 1 dollar per ether
+          await expect(dynamicSvgNft.mintNft(highValue)).to.emit(
+            dynamicSvgNft,
+            "CreatedNFT"
+          );
+          const tokenCounter = await dynamicSvgNft.getTokenCounter();
+          assert.equal(tokenCounter.toString(), "1");
+          const tokenURI = await dynamicSvgNft.tokenURI(0);
+          assert.equal(tokenURI, highTokenUri);
+        });
+        it("shifts the token uri to lower when the price doesn't surpass the highvalue", async function () {
+          const highValue = ethers.utils.parseEther("100000000"); // $100,000,000 dollar per ether. Maybe in the distant future this test will fail...
+          const txResponse = await dynamicSvgNft.mintNft(highValue);
+          await txResponse.wait(1);
+          const tokenURI = await dynamicSvgNft.tokenURI(0);
+          assert.equal(tokenURI, lowTokenUri);
         });
       });
     });
