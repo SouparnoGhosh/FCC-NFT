@@ -124,4 +124,4 @@ async function handleTokenUris() {
 }
 
 export default deployRandomIpfsNft;
-deployRandomIpfsNft.tags = ["all", "randomipfs", "main"];
+deployRandomIpfsNft.tags = ["all", "randomipfs"];

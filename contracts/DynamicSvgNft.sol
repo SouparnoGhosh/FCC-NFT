@@ -7,28 +7,33 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "base64-sol/base64.sol";
 
-contract DynamicSvgNft is ERC721 {
+contract DynamicSvgNft is ERC721, Ownable {
     // Variables
     uint256 private s_tokenCounter;
     string private s_lowImageURI;
     string private s_highImageURI;
-    // mapping(uint256 => int256) private s_tokenIdToHighValues;
-    // AggregatorV3Interface internal immutable i_priceFeed;
+    mapping(uint256 => int256) private s_tokenIdToHighValues;
+    AggregatorV3Interface internal immutable i_priceFeed;
 
     // Events
     event CreatedNFT(uint256 indexed tokenId, int256 highValue);
 
     // Constructor
-    constructor(string memory lowSvg, string memory highSvg)
-        ERC721("Dynamic SVG NFT", "DSN")
-    {
+    constructor(
+        address priceFeedAddress,
+        string memory lowSvg,
+        string memory highSvg
+    ) ERC721("Dynamic SVG NFT", "DSN") {
         s_tokenCounter = 0;
+        i_priceFeed = AggregatorV3Interface(priceFeedAddress);
         s_lowImageURI = svgToImageURI(lowSvg);
         s_highImageURI = svgToImageURI(highSvg);
     }
 
     // Functions
-    function mintNft() public payable {
+    function mintNft(int256 highValue) public payable {
+        s_tokenIdToHighValues[s_tokenCounter] = highValue;
+        emit CreatedNFT(s_tokenCounter, highValue);
         uint256 tokenId = s_tokenCounter;
         _safeMint(msg.sender, tokenId);
         s_tokenCounter += 1;
@@ -46,12 +51,52 @@ contract DynamicSvgNft is ERC721 {
         return string(abi.encodePacked(baseURL, svgBase64Encoded));
     }
 
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
+        require(
+            _exists(tokenId),
+            "ERC721Metadata: URI query for nonexistent token"
+        );
+        (, int256 price, , , ) = i_priceFeed.latestRoundData();
+        string memory imageURI = s_lowImageURI;
+        if (price >= s_tokenIdToHighValues[tokenId]) {
+            imageURI = s_highImageURI;
+        }
+        return
+            string(
+                abi.encodePacked(
+                    _baseURI(),
+                    Base64.encode(
+                        bytes(
+                            abi.encodePacked(
+                                '{"name":"',
+                                name(), // You can add whatever name here
+                                '", "description":"An NFT that changes based on the Chainlink Feed", ',
+                                '"attributes": [{"trait_type": "coolness", "value": 100}], "image":"',
+                                imageURI,
+                                '"}'
+                            )
+                        )
+                    )
+                )
+            );
+    }
+
     function getLowSVG() public view returns (string memory) {
         return s_lowImageURI;
     }
 
     function getHighSVG() public view returns (string memory) {
         return s_highImageURI;
+    }
+
+    function _baseURI() internal pure override returns (string memory) {
+        return "data:application/json;base64,";
     }
 
     function getPriceFeed() public view returns (AggregatorV3Interface) {
